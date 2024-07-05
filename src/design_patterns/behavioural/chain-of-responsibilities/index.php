@@ -132,24 +132,28 @@ class AccessExclusiveFeature
 {
 
     /**
-     * @var Middleware
+     * @var array
      */
-    private $middleware;
+    private $middleWareArr = [];
 
     /**
      * The client can configure the server with a chain of middleware objects.
      */
-    public function setMiddleware(Middleware $middleware): void
+    public function setMiddleware(array $middleWareArr): void
     {
-        $this->middleware = $middleware;
+        $this->middleWareArr = $middleWareArr;
     }
-    // public function runMiddleware(array $middleware): void
-    // {
-    //     foreach ($variable as $key => $value) {
-    //         # code...
-    //     }
-    //     $this->middleware = $middleware;
-    // }
+    public function compileMiddlewares(): Middleware
+    {
+        return array_reduce($this->middleWareArr, function ($acc, $curr) {
+            if ($acc) {
+                return ($curr->setNext($acc));
+            } else {
+                return $curr;
+            }
+
+        });
+    }
 
     /**
      * The server gets the email and password from the client and sends the
@@ -157,7 +161,7 @@ class AccessExclusiveFeature
      */
     public function getFeature(User $user): bool
     {
-        if ($this->middleware->runChecks($user)) {
+        if ($this->compileMiddlewares()->runChecks($user)) {
             echo "AccessExclusiveFeature: Authorization has been successful!\n";
             // Do something useful for authorized users.
             return true;
@@ -169,22 +173,12 @@ class AccessExclusiveFeature
 
 echo "<pre>";
 $user = new User("admin@example.com", 100);
-$sufficientBalance = new SufficientBalanceMiddleware();
-$isAdmin = new IsAdminMiddleware();
-$userExists = new UserExistsMiddleware();
-// $middleWareArr=[new SufficientBalanceMiddleware(),new IsAdminMiddleware()];
-// array_reduce($middleWareArr,function($acc,$curr){
-// if($acc){
-//     return ($acc)->setNext($curr);
-// }else{
-//     return $curr;
-// }
 
-// });
-$middleWare = $sufficientBalance->setNext($isAdmin->setNext($userExists));
+$middleWareArr = [new SufficientBalanceMiddleware(), new IsAdminMiddleware(), new UserExistsMiddleware()];
+
 $getExclusiveFeature = new AccessExclusiveFeature();
 
-$getExclusiveFeature->setMiddleware($middleWare);
+$getExclusiveFeature->setMiddleware($middleWareArr);
 $getExclusiveFeature->getFeature($user);
 
 
