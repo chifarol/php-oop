@@ -7,7 +7,7 @@ namespace Chifarol\PhpOOP;
 
 abstract class PaymentMethodCreator
 {
-    abstract public function getPaymentMethod(): PaymentMethodInterface;
+    abstract public function getPaymentMethod(string $category): PaymentMethodInterface;
 
     public function someOperation(): string
     {
@@ -23,14 +23,11 @@ abstract class PaymentMethodCreator
 
 class SelectPayment extends PaymentMethodCreator
 {
-    public function __construct(private string $category)
-    {
 
-    }
 
-    public function getPaymentMethod(): PaymentMethodInterface
+    static public function getPaymentMethod(string $category): PaymentMethodInterface
     {
-        if ($this->category === "stripe") {
+        if ($category === "stripe") {
 
             return new StripePayment();
         } else {
@@ -77,15 +74,15 @@ echo "<pre>";
 
 
 echo "App: Launched with the paypal payment.\n";
-echo (new SelectPayment("paypal"))->getPaymentMethod()->operation();
+echo SelectPayment::getPaymentMethod("paypal")->operation();
 echo "\n\n";
 
 echo "App: Launched with the stripe payment.\n";
-echo (new SelectPayment("stripe"))->getPaymentMethod()->operation();
+echo SelectPayment::getPaymentMethod("stripe")->operation();
 echo "\n\n";
 
 echo "App: Launched with the ConcretePaymentMethod2.\n";
-clientCode(new SelectPayment("stripe"));
+clientCode(new SelectPayment());
 
 
 

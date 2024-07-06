@@ -148,6 +148,7 @@ class AccessExclusiveFeature
         return array_reduce($this->middleWareArr, function ($acc, $curr) {
             if ($acc) {
                 return ($curr->setNext($acc));
+                // $currMiddleWare->setNext(  $pastMiddleWare->setNext($prevMiddleWare) )
             } else {
                 return $curr;
             }
@@ -173,10 +174,13 @@ class AccessExclusiveFeature
 
 echo "<pre>";
 $user = new User("admin@example.com", 100);
-
 $middleWareArr = [new SufficientBalanceMiddleware(), new IsAdminMiddleware(), new UserExistsMiddleware()];
-
 $getExclusiveFeature = new AccessExclusiveFeature();
+
+// $sufficientBalance = new SufficientBalanceMiddleware();
+// $isAdmin = new IsAdminMiddleware();
+// $userExists = new UserExistsMiddleware();
+// $middleWare = $sufficientBalance->setNext($isAdmin->setNext($userExists));
 
 $getExclusiveFeature->setMiddleware($middleWareArr);
 $getExclusiveFeature->getFeature($user);

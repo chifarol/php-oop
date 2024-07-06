@@ -2,6 +2,8 @@
 
 // A proxy receives client requests, does some work (access control, lazy loading, caching, controlling the access, logging etc.) and then passes the request to a service object.
 
+// you can define a shared interface between the class and the proxy or eimply extend the class, main thing is you'd like to does some work on it before executing or passing to the service object
+
 /**
  * The Subject interface describes the interface of a real object.
  *
